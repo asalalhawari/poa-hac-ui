@@ -1,7 +1,9 @@
 import { app } from './app.js';
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
+const PORT = Number(process.env.PORT) || 3001;
+const HOST = '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
   console.log('=======================================================');
   console.log(`🚀 HAC Signal Investigation Service Running on Port ${PORT}`);
   console.log(`🏥 Health Check:      http://localhost:${PORT}/api/health`);

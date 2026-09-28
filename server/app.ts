@@ -12,7 +12,10 @@ import { hacRouter } from './routes/hacRoutes.js';
 export const app = express();
 
 // Security & Parsing Middleware
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
 app.use(express.json());
 
 // Request logger
