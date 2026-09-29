@@ -1,0 +1,334 @@
+{
+  "claims": [
+    {
+      "claimId": "CLM-2026-0841",
+      "patientId": "PAT-9401",
+      "patientAge": 58,
+      "patientGender": "F",
+      "providerId": "PRV-MUSCAT-01",
+      "providerFacilityCode": "FAC-MCT-001",
+      "providerDisplayName": "Muscat General Hospital",
+      "admissionDateTime": "2026-03-10T08:00:00.000Z",
+      "dischargeDateTime": "2026-03-18T14:00:00.000Z",
+      "lengthOfStayDays": 8,
+      "encounterType": "INPATIENT",
+      "reviewStatus": "NEW",
+      "primaryDiagnosis": {
+        "code": "K80.00",
+        "description": "Calculus of gallbladder with acute cholecystitis without obstruction",
+        "isPrimaryAdmissionDiagnosis": true,
+        "isSuspectedHacCondition": false,
+        "firstObservedDateTime": "2026-03-10T08:00:00.000Z"
+      },
+      "diagnoses": [
+        {
+          "code": "K80.00",
+          "description": "Calculus of gallbladder with acute cholecystitis without obstruction",
+          "isPrimaryAdmissionDiagnosis": true,
+          "isSuspectedHacCondition": false,
+          "firstObservedDateTime": "2026-03-10T08:00:00.000Z"
+        },
+        {
+          "code": "T81.4XXA",
+          "description": "Infection following a procedure, deep surgical site infection, initial encounter",
+          "isPrimaryAdmissionDiagnosis": false,
+          "isSuspectedHacCondition": true,
+          "firstObservedDateTime": "2026-03-13T11:00:00.000Z"
+        },
+        {
+          "code": "A41.9",
+          "description": "Sepsis, unspecified organism",
+          "isPrimaryAdmissionDiagnosis": false,
+          "isSuspectedHacCondition": false,
+          "firstObservedDateTime": "2026-03-13T16:00:00.000Z"
+        }
+      ],
+      "procedures": [
+        {
+          "code": "47562",
+          "description": "Laparoscopic cholecystectomy",
+          "performedDateTime": "2026-03-10T11:30:00.000Z",
+          "isPlannedOnAdmission": true
+        },
+        {
+          "code": "49002",
+          "description": "Reopening of recent laparotomy with incision and drainage / surgical debridement",
+          "performedDateTime": "2026-03-14T07:15:00.000Z",
+          "isPlannedOnAdmission": false,
+          "isReturnToTheatre": true,
+          "requiresPreApproval": true,
+          "preApprovalObtained": false
+        },
+        {
+          "code": "99.18",
+          "description": "Injection or infusion of broad-spectrum antibiotic rescue agent (Vancomycin)",
+          "performedDateTime": "2026-03-13T12:00:00.000Z",
+          "isPlannedOnAdmission": false,
+          "isRescueDrug": true
+        }
+      ],
+      "isPatientHistoryAvailable": true,
+      "patientHistory": [
+        {
+          "id": "HIST-9401-01",
+          "claimId": "CLM-2026-0412",
+          "providerId": "PRV-MUSCAT-01",
+          "facilityCode": "FAC-MCT-001",
+          "serviceDateTime": "2026-02-20T10:00:00.000Z",
+          "procedureCode": "47600",
+          "procedureDescription": "Exploration of common bile duct",
+          "isRelatedToCurrentCondition": true,
+          "daysPriorToAdmission": 18
+        }
+      ]
+    },
+    {
+      "claimId": "CLM-2026-1123",
+      "patientId": "PAT-5529",
+      "patientAge": 69,
+      "patientGender": "M",
+      "providerId": "PRV-SALALAH-04",
+      "providerFacilityCode": "FAC-SLL-004",
+      "providerDisplayName": "Salalah Care Center",
+      "admissionDateTime": "2026-03-14T11:00:00.000Z",
+      "dischargeDateTime": "2026-03-19T10:00:00.000Z",
+      "lengthOfStayDays": 5,
+      "encounterType": "INPATIENT",
+      "reviewStatus": "IN_REVIEW",
+      "primaryDiagnosis": {
+        "code": "I50.9",
+        "description": "Heart failure, unspecified decompensated",
+        "isPrimaryAdmissionDiagnosis": true,
+        "isSuspectedHacCondition": false,
+        "firstObservedDateTime": "2026-03-14T11:00:00.000Z"
+      },
+      "diagnoses": [
+        {
+          "code": "I50.9",
+          "description": "Heart failure, unspecified decompensated",
+          "isPrimaryAdmissionDiagnosis": true,
+          "isSuspectedHacCondition": false,
+          "firstObservedDateTime": "2026-03-14T11:00:00.000Z"
+        },
+        {
+          "code": "T83.511A",
+          "description": "Infection and inflammatory reaction due to indwelling urinary catheter, initial encounter",
+          "isPrimaryAdmissionDiagnosis": false,
+          "isSuspectedHacCondition": true,
+          "firstObservedDateTime": "2026-03-16T15:30:00.000Z"
+        },
+        {
+          "code": "N39.0",
+          "description": "Urinary tract infection, site not specified",
+          "isPrimaryAdmissionDiagnosis": false,
+          "isSuspectedHacCondition": false,
+          "firstObservedDateTime": "2026-03-16T15:30:00.000Z"
+        }
+      ],
+      "procedures": [
+        {
+          "code": "57.94",
+          "description": "Insertion of indwelling urinary catheter",
+          "performedDateTime": "2026-03-14T13:00:00.000Z",
+          "isPlannedOnAdmission": true
+        },
+        {
+          "code": "99.21",
+          "description": "Infusion of targeted rescue antibiotic therapy (Ceftriaxone)",
+          "performedDateTime": "2026-03-16T17:00:00.000Z",
+          "isPlannedOnAdmission": false,
+          "isRescueDrug": true,
+          "isRescueIntervention": true
+        }
+      ],
+      "isPatientHistoryAvailable": true,
+      "patientHistory": []
+    },
+    {
+      "claimId": "CLM-2026-2049",
+      "patientId": "PAT-3180",
+      "patientAge": 76,
+      "patientGender": "F",
+      "providerId": "PRV-NIZWA-02",
+      "providerFacilityCode": "FAC-NZW-002",
+      "providerDisplayName": "Nizwa Regional Hospital",
+      "admissionDateTime": "2026-03-18T06:00:00.000Z",
+      "dischargeDateTime": "2026-03-24T18:00:00.000Z",
+      "lengthOfStayDays": 6,
+      "encounterType": "INPATIENT",
+      "reviewStatus": "MONITORING",
+      "primaryDiagnosis": {
+        "code": "I63.9",
+        "description": "Cerebral infarction, unspecified (Acute ischemic stroke)",
+        "isPrimaryAdmissionDiagnosis": true,
+        "isSuspectedHacCondition": false,
+        "firstObservedDateTime": "2026-03-18T06:00:00.000Z"
+      },
+      "diagnoses": [
+        {
+          "code": "I63.9",
+          "description": "Cerebral infarction, unspecified (Acute ischemic stroke)",
+          "isPrimaryAdmissionDiagnosis": true,
+          "isSuspectedHacCondition": false,
+          "firstObservedDateTime": "2026-03-18T06:00:00.000Z"
+        },
+        {
+          "code": "L89.152",
+          "description": "Pressure ulcer of sacral region, stage 2",
+          "isPrimaryAdmissionDiagnosis": false,
+          "isSuspectedHacCondition": true,
+          "firstObservedDateTime": "2026-03-21T09:00:00.000Z"
+        }
+      ],
+      "procedures": [
+        {
+          "code": "86.28",
+          "description": "Nonexcisional debridement and specialized wound barrier dressing",
+          "performedDateTime": "2026-03-21T11:00:00.000Z",
+          "isPlannedOnAdmission": false
+        }
+      ],
+      "isPatientHistoryAvailable": false,
+      "patientHistory": []
+    },
+    {
+      "claimId": "CLM-2026-3392",
+      "patientId": "PAT-7215",
+      "patientAge": 71,
+      "patientGender": "M",
+      "providerId": "PRV-SOHAR-01",
+      "providerFacilityCode": "FAC-SHR-001",
+      "providerDisplayName": "Sohar Medical Complex",
+      "admissionDateTime": "2026-03-20T14:00:00.000Z",
+      "dischargeDateTime": "2026-03-23T11:00:00.000Z",
+      "lengthOfStayDays": 3,
+      "encounterType": "INPATIENT",
+      "reviewStatus": "RESOLVED",
+      "primaryDiagnosis": {
+        "code": "S72.001A",
+        "description": "Fracture of unspecified part of neck of right femur, initial encounter",
+        "isPrimaryAdmissionDiagnosis": true,
+        "isSuspectedHacCondition": false,
+        "firstObservedDateTime": "2026-03-20T14:00:00.000Z"
+      },
+      "diagnoses": [
+        {
+          "code": "S72.001A",
+          "description": "Fracture of unspecified part of neck of right femur, initial encounter",
+          "isPrimaryAdmissionDiagnosis": true,
+          "isSuspectedHacCondition": false,
+          "firstObservedDateTime": "2026-03-20T14:00:00.000Z"
+        },
+        {
+          "code": "L89.311",
+          "description": "Pressure ulcer of right buttock, stage 1 (Present on admission)",
+          "isPrimaryAdmissionDiagnosis": false,
+          "isSuspectedHacCondition": true,
+          "firstObservedDateTime": "2026-03-20T14:00:00.000Z"
+        }
+      ],
+      "procedures": [
+        {
+          "code": "79.35",
+          "description": "Open reduction of fracture with internal fixation, femur",
+          "performedDateTime": "2026-03-21T09:00:00.000Z",
+          "isPlannedOnAdmission": true
+        }
+      ],
+      "isPatientHistoryAvailable": true,
+      "patientHistory": []
+    },
+    {
+      "claimId": "CLM-2026-4401",
+      "patientId": "PAT-8812",
+      "patientAge": 64,
+      "patientGender": "F",
+      "providerId": "PRV-MUSCAT-02",
+      "providerFacilityCode": "FAC-MCT-002",
+      "providerDisplayName": "Sultan Qaboos Medical City",
+      "admissionDateTime": "2026-03-15T09:00:00.000Z",
+      "dischargeDateTime": "2026-03-22T12:00:00.000Z",
+      "lengthOfStayDays": 7,
+      "encounterType": "INPATIENT",
+      "reviewStatus": "IN_REVIEW",
+      "primaryDiagnosis": {
+        "code": "M16.11",
+        "description": "Unilateral primary osteoarthritis, right hip",
+        "isPrimaryAdmissionDiagnosis": true,
+        "isSuspectedHacCondition": false,
+        "firstObservedDateTime": "2026-03-15T09:00:00.000Z"
+      },
+      "diagnoses": [
+        {
+          "code": "M16.11",
+          "description": "Unilateral primary osteoarthritis, right hip",
+          "isPrimaryAdmissionDiagnosis": true,
+          "isSuspectedHacCondition": false,
+          "firstObservedDateTime": "2026-03-15T09:00:00.000Z"
+        },
+        {
+          "code": "I26.99",
+          "description": "Other pulmonary embolism without acute cor pulmonale",
+          "isPrimaryAdmissionDiagnosis": false,
+          "isSuspectedHacCondition": true,
+          "firstObservedDateTime": "2026-03-17T08:00:00.000Z"
+        }
+      ],
+      "procedures": [
+        {
+          "code": "81.51",
+          "description": "Total hip replacement, right",
+          "performedDateTime": "2026-03-15T11:00:00.000Z",
+          "isPlannedOnAdmission": true
+        },
+        {
+          "code": "87.41",
+          "description": "Computed tomography of thorax (CTPA)",
+          "performedDateTime": "2026-03-17T09:30:00.000Z",
+          "isPlannedOnAdmission": false,
+          "isImagingOrDiagnostic": true,
+          "hasAbnormalResult": true
+        },
+        {
+          "code": "99.19",
+          "description": "Continuous intravenous therapeutic heparin infusion rescue",
+          "performedDateTime": "2026-03-17T10:00:00.000Z",
+          "isPlannedOnAdmission": false,
+          "isRescueDrug": true,
+          "isRescueIntervention": true
+        }
+      ],
+      "isPatientHistoryAvailable": true,
+      "patientHistory": []
+    }
+  ],
+  "notes": [
+    {
+      "id": "NOTE-0841-01",
+      "claimId": "CLM-2026-0841",
+      "author": "Dr. Sarah Al-Busaidi",
+      "authorRole": "Chief Medical Officer",
+      "content": "Patient developed high fever (39.2°C) and wound erythema on post-op Day 3. Swab showed heavy growth of MRSA. Surgical washout and drainage performed.",
+      "createdAt": "2026-03-14T09:30:00.000Z"
+    },
+    {
+      "id": "NOTE-1123-01",
+      "claimId": "CLM-2026-1123",
+      "author": "Dr. Tariq Al-Hinai",
+      "authorRole": "Clinical Auditor",
+      "content": "Foley catheter placed on admission. Mid-stay dysuria and positive urine culture (>100k CFU/mL E. coli) on Day 3. Initiated rescue IV Ceftriaxone.",
+      "createdAt": "2026-03-17T11:15:00.000Z"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "DEC-3392-01",
+      "claimId": "CLM-2026-3392",
+      "outcome": "NO_CONCERN",
+      "rationale": "Stage 1 sacral pressure injury was explicitly documented upon physical intake at emergency admission. Timing proves Present On Admission (POA = Yes).",
+      "reviewerId": "REV-009",
+      "reviewerName": "Clinical QA Lead",
+      "decidedAt": "2026-03-21T10:00:00.000Z"
+    }
+  ]
+}

@@ -13,17 +13,30 @@ import {
 import { HacScoringService } from './HacScoringService.js';
 import { PersistentJsonStore } from './PersistentJsonStore.js';
 
+import { SAMPLE_CLAIMS, SAMPLE_DECISIONS, SAMPLE_NOTES } from '../data/seedClaims.js';
+
 type WorkflowDb = {
   claims: ClaimEntity[];
   notes: ReviewerNoteDTO[];
   decisions: HumanReviewDecisionDTO[];
 };
 
-const EMPTY_DB: WorkflowDb = { claims: [], notes: [], decisions: [] };
+const SEED_DB: WorkflowDb = {
+  claims: SAMPLE_CLAIMS,
+  notes: SAMPLE_NOTES,
+  decisions: SAMPLE_DECISIONS,
+};
 
 export class ReviewWorkflowService {
   private static readDb(): WorkflowDb {
-    return PersistentJsonStore.read<WorkflowDb>('workflow.json', EMPTY_DB);
+    const db = PersistentJsonStore.read<WorkflowDb>('workflow.json', SEED_DB);
+    if (!db.claims || db.claims.length === 0) {
+      db.claims = SAMPLE_CLAIMS;
+      db.notes = db.notes && db.notes.length > 0 ? db.notes : SAMPLE_NOTES;
+      db.decisions = db.decisions && db.decisions.length > 0 ? db.decisions : SAMPLE_DECISIONS;
+      this.writeDb(db);
+    }
+    return db;
   }
 
   private static writeDb(db: WorkflowDb) {

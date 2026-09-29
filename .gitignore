@@ -4,7 +4,5 @@ dist-server/
 .env
 .DS_Store
 *.tsbuildinfo
-server/data/runtime/workflow.json
-server/data/runtime/config.json
-server/data/runtime/reference-codes.json
 .vercel
+
