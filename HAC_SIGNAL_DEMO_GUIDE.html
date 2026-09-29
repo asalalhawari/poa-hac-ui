@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HAC Signal & POA Engine — Executive Architecture & Demo Guide</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Mermaid.js for Architecture Diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+  <style>
+    :root {
+      --bg-base: #090d16;
+      --bg-surface: #101726;
+      --bg-card: #151e32;
+      --bg-card-hover: #1c2742;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-bright: rgba(255, 255, 255, 0.16);
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.18);
+      --accent: #818cf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --purple: #c084fc;
+
+      --risk-high: #ef4444;
+      --risk-review: #f59e0b;
+      --risk-monitor: #0284c7;
+      --risk-none: #10b981;
+
+      --font-heading: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-arabic: 'Cairo', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: #f1f5f9;
+      --bg-card-hover: #e2e8f0;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-bright: rgba(0, 0, 0, 0.15);
+      
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
+      
+      --primary: #0284c7;
+      --primary-glow: rgba(2, 132, 199, 0.15);
+      --accent: #6366f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 15px;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Ambient background glow */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 20%;
+      width: 60vw;
+      height: 400px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.07) 0%, rgba(129, 140, 248, 0.04) 50%, transparent 80%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Layout structure */
+    .sidebar {
+      width: 290px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      padding: 2rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 3rem 4.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      z-index: 1;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar Styling */
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .brand-text h1 {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-text p {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .nav-group-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      font-weight: 700;
+      margin: 1.25rem 0 0.5rem 0.5rem;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--primary);
+      background: rgba(56, 189, 248, 0.09);
+    }
+
+    .quick-status {
+      margin-top: auto;
+      padding: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--emerald);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    /* Hero / Top Header */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+      border: 1px solid var(--border-bright);
+      border-radius: 20px;
+      padding: 2.5rem;
+      margin-bottom: 3rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .hero-banner::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-primary { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-purple  { background: rgba(192, 132, 252, 0.15); color: var(--purple); border: 1px solid rgba(192, 132, 252, 0.3); }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 0.8rem;
+      background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 820px;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7, #3b82f6);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-bright);
+    }
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+    }
+
+    /* Content Typography & Section Styles */
+    section {
+      margin-bottom: 4rem;
+      scroll-margin-top: 2rem;
+    }
+
+    h2.section-heading {
+      font-family: var(--font-heading);
+      font-size: 1.7rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      margin-bottom: 1.75rem;
+      max-width: 850px;
+    }
+
+    /* Cards & Grid */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-2px);
+    }
+
+    .callout {
+      border-left: 4px solid var(--primary);
+      background: rgba(56, 189, 248, 0.05);
+      border-radius: 0 12px 12px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .callout-title {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Tables */
+    .table-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: var(--bg-card);
+      padding: 0.9rem 1.1rem;
+      font-family: var(--font-heading);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 0.9rem 1.1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    /* Score Badge Pills */
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.15rem;
+    }
+
+    .score-high { background: rgba(239, 68, 68, 0.15); color: var(--risk-high); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .score-review { background: rgba(245, 158, 11, 0.15); color: var(--risk-review); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .score-monitor { background: rgba(2, 132, 199, 0.15); color: var(--risk-monitor); border: 1px solid rgba(2, 132, 199, 0.3); }
+    .score-none { background: rgba(16, 185, 129, 0.15); color: var(--risk-none); border: 1px solid rgba(16, 185, 129, 0.3); }
+
+    .risk-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .risk-pill.high { background: var(--risk-high); color: #fff; }
+    .risk-pill.review { background: var(--risk-review); color: #000; }
+    .risk-pill.monitor { background: var(--risk-monitor); color: #fff; }
+    .risk-pill.none { background: var(--risk-none); color: #fff; }
+
+    /* Code & Technical Pills */
+    code {
+      font-family: var(--font-mono);
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-color);
+      padding: 0.15rem 0.4rem;
+      border-radius: 6px;
+      font-size: 0.85em;
+      color: #38bdf8;
+    }
+
+    /* Interactive Timeline Demo Script */
+    .timeline-script {
+      position: relative;
+      border-left: 2px solid var(--border-bright);
+      margin-left: 1.5rem;
+      padding-left: 2rem;
+    }
+
+    .timeline-step {
+      position: relative;
+      margin-bottom: 2.2rem;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: calc(-2rem - 9px);
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--bg-base);
+      border: 3px solid var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    .timeline-time {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.2rem;
+    }
+
+    .timeline-header {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .script-quote {
+      background: var(--bg-surface);
+      border-left: 3px solid var(--accent);
+      padding: 0.9rem 1.25rem;
+      border-radius: 0 10px 10px 0;
+      font-style: italic;
+      color: #cbd5e1;
+      margin: 0.6rem 0;
+      font-size: 0.92rem;
+    }
+
+    .script-arabic {
+      font-family: var(--font-arabic);
+      direction: rtl;
+      text-align: right;
+      background: rgba(245, 158, 11, 0.06);
+      border-right: 3px solid var(--amber);
+      border-left: none;
+      padding: 0.9rem 1.25rem;
+      border-radius: 10px 0 0 10px;
+      color: #fde68a;
+      margin: 0.6rem 0;
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+
+    /* Mermaid diagrams container */
+    .diagram-card {
+      background: #0d131f;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+
+    /* Print Optimization */
+    @media print {
+      body { background: #fff; color: #000; }
+      .sidebar, .hero-links, .theme-toggle { display: none !important; }
+      .main-content { max-width: 100%; padding: 0; }
+      .hero-banner, .card, .table-container { border: 1px solid #ccc; box-shadow: none; }
+      code { border: 1px solid #ccc; background: #f5f5f5; color: #000; }
+    }
+
+    @media (max-width: 992px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: static; }
+      .main-content { padding: 2rem 1.5rem; }
+      .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Navigation Sidebar -->
+  <aside class="sidebar">
+    <div class="brand-box">
+      <div class="brand-icon">🏥</div>
+      <div class="brand-text">
+        <h1>HAC Signal</h1>
+        <p>POA Audit Engine</p>
+      </div>
+    </div>
+
+    <div class="nav-group-title">Navigation Index</div>
+    <ul class="nav-links">
+      <li><a href="#summary" class="active"><span>01</span> Executive Pitch</a></li>
+      <li><a href="#domain"><span>02</span> HAC & POA Basics</a></li>
+      <li><a href="#governance"><span>03</span> Governance Invariant</a></li>
+      <li><a href="#components"><span>04</span> 5-Pillar Engine (A–E)</a></li>
+      <li><a href="#suppressors"><span>05</span> Fairness Suppressors</a></li>
+      <li><a href="#levels"><span>06</span> Risk Cutoffs & Bands</a></li>
+      <li><a href="#cases"><span>07</span> Live Seed Cases</a></li>
+      <li><a href="#demo-script"><span>08</span> 5-Minute Demo Script</a></li>
+      <li><a href="#architecture"><span>09</span> Cloud Architecture</a></li>
+    </ul>
+
+    <div class="quick-status">
+      <div class="status-indicator">
+        <span class="status-dot"></span>
+        <span>Systems Live & Healthy</span>
+      </div>
+      <p style="color: var(--text-dim); font-size: 0.72rem; line-height: 1.4;">
+        Vercel SPA + Render Node API synchronized with active clinical dataset.
+      </p>
+    </div>
+  </aside>
+
+  <!-- Main Showcase Content -->
+  <main class="main-content">
+
+    <!-- Top Executive Header -->
+    <header class="hero-banner">
+      <div class="hero-badges">
+        <span class="badge badge-emerald">● PRODUCTION LIVE</span>
+        <span class="badge badge-primary">ICD-10-CM / CPT ACCREDITED</span>
+        <span class="badge badge-purple">OMAN DHAMANI / PAYER READY</span>
+      </div>
+      <h1 class="hero-title">Hospital-Acquired Complication (HAC)<br>& Inferred POA Investigation Engine</h1>
+      <p class="hero-subtitle">
+        An enterprise automated clinical auditing and payment integrity platform designed to detect in-stay complications, eliminate fraudulent billing, and protect hospital fairness with mathematical evidence trails.
+      </p>
+      <div class="hero-links">
+        <a href="https://poa-hac-ui.vercel.app/claims" target="_blank" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          Open Live Review Queue
+        </a>
+        <a href="https://poa-hac-ui.vercel.app/analytics" target="_blank" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          Population Analytics
+        </a>
+        <button onclick="window.print()" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          Print / PDF Export
+        </button>
+      </div>
+    </header>
+
+    <!-- SECTION 1: Executive Summary -->
+    <section id="summary">
+      <h2 class="section-heading">01. Executive Pitch & Value Proposition</h2>
+      <p class="section-desc">
+        Why this platform exists and how it saves healthcare systems and insurance funds millions in preventable outlays.
+      </p>
+      
+      <div class="grid-3">
+        <div class="card">
+          <div style="font-size: 1.8rem; margin-bottom: 0.6rem;">💸</div>
+          <h3 style="font-family: var(--font-heading); margin-bottom: 0.4rem;">Financial Waste</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            Payers unknowingly pay for prolonged ICU days, revision surgeries, and expensive rescue antibiotics caused by avoidable in-hospital errors.
+          </p>
+        </div>
+        <div class="card">
+          <div style="font-size: 1.8rem; margin-bottom: 0.6rem;">⏱️</div>
+          <h3 style="font-family: var(--font-heading); margin-bottom: 0.4rem;">Manual Audit Fatigue</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            Physician reviewers spend 40+ minutes per claim digging through 200 pages of nursing notes just to confirm whether a bed sore was present on arrival.
+          </p>
+        </div>
+        <div class="card">
+          <div style="font-size: 1.8rem; margin-bottom: 0.6rem;">⚖️</div>
+          <h3 style="font-family: var(--font-heading); margin-bottom: 0.4rem;">Provider Dispute Shield</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            Eliminates hospital disputes by providing timestamped, mathematically rigorous evidence cards that prove in-stay onset beyond doubt.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Domain Fundamentals -->
+    <section id="domain">
+      <h2 class="section-heading">02. Domain Fundamentals: HAC vs. POA</h2>
+      <p class="section-desc">
+        The core distinction that determines medical liability, clinical quality rating, and claim reimbursement.
+      </p>
+
+      <div class="grid-2">
+        <div class="card" style="border-top: 3px solid var(--rose);">
+          <span class="badge" style="background: rgba(244, 63, 94, 0.15); color: var(--rose); margin-bottom: 0.8rem;">HAC (HOSPITAL-ACQUIRED COMPLICATION)</span>
+          <h3 style="font-family: var(--font-heading); font-size: 1.2rem; margin-bottom: 0.6rem;">In-Stay Quality Breakdown</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
+            An adverse physical injury, infection, or physiologic event that was <strong>absent upon emergency or elective admission</strong>, but occurred while the patient was hospitalized.
+          </p>
+          <ul style="color: var(--text-dim); font-size: 0.82rem; padding-left: 1.2rem; line-height: 1.8;">
+            <li>Surgical site dehiscence & deep space MRSA infections</li>
+            <li>Indwelling Foley catheter-associated urinary tract infections (CAUTI)</li>
+            <li>Stage 2 to 4 sacral decubitus ulcers</li>
+            <li>Hospital-acquired deep vein thrombosis / pulmonary embolism</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-top: 3px solid var(--emerald);">
+          <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--emerald); margin-bottom: 0.8rem;">POA (PRESENT ON ADMISSION)</span>
+          <h3 style="font-family: var(--font-heading); font-size: 1.2rem; margin-bottom: 0.6rem;">Pre-Existing Baseline Path</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
+            A clinical diagnosis that was <strong>already established or clinically evident at the moment of inpatient intake</strong> (Elapsed hours = 0.0).
+          </p>
+          <ul style="color: var(--text-dim); font-size: 0.82rem; padding-left: 1.2rem; line-height: 1.8;">
+            <li>Pressure sore already documented by ambulance EMTs or ER triage</li>
+            <li>Pneumonia presenting with fever upon arrival at emergency desk</li>
+            <li>Chronic ulcerations from longstanding diabetic neuropathy</li>
+            <li><strong>Legal outcome:</strong> Zero liability to the hospital; fully reimbursable</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: Governance Invariant -->
+    <section id="governance">
+      <h2 class="section-heading">03. The Golden Governance Invariant</h2>
+      <p class="section-desc">
+        The non-negotiable architectural rule that ensures regulatory compliance and ethical clinical artificial intelligence.
+      </p>
+
+      <div class="callout">
+        <div class="callout-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          MANDATORY CLINICAL ARCHITECTURE RULE
+        </div>
+        <p style="color: var(--text-main); font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem;">
+          The system strictly enforces: <code>action === 'HUMAN_REVIEW'</code>. Automated claim denials are prohibited.
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          Healthcare clinical judgments require human-in-the-loop validation. The engine acts as an <strong>objective investigative co-pilot</strong> that automatically calculates mathematical risk scores, surfaces timestamped evidence cards, and assembles the patient trajectory, leaving the final legal payment decision in the hands of a licensed clinical auditor.
+        </p>
+      </div>
+    </section>
+
+    <!-- SECTION 4: 5-Pillar Engine -->
+    <section id="components">
+      <h2 class="section-heading">04. The 5-Pillar Mathematical Scoring Engine</h2>
+      <p class="section-desc">
+        How every claim receives an auditable, deterministic score from 0 to 100 based on five clinical criteria:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Pillar</th>
+              <th>Evaluation Domain</th>
+              <th>Max Pts</th>
+              <th>Underlying Logic & Clinical Triggers</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Component A</strong></td>
+              <td>Diagnosis Code Transparency</td>
+              <td><strong>20 pts</strong></td>
+              <td>
+                Bands <strong>A1–A6</strong>. Evaluates what the ICD-10 descriptor confesses. E.g., <code>T81.4</code> explicitly names a care event (20 pts); <code>T83.5</code> names a catheter device (16 pts); <code>L89.152</code> is on complication surveillance list (6 pts).
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Component B</strong></td>
+              <td>Timing & Inferred POA</td>
+              <td><strong>20 pts</strong></td>
+              <td>
+                Calculates elapsed hours ($\Delta t$). $\ge 48$ hours after admission = <strong>20 pts</strong> (clear in-stay onset). $24–48$ hours = <strong>12 pts</strong>. Hour 0.0 (present upon admission line) = <strong>0 pts</strong> (Clean POA).
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Component C</strong></td>
+              <td>Clinical Relatedness to Admission</td>
+              <td><strong>20 pts</strong></td>
+              <td>
+                Tests if complication is an expected natural progression. <em>Real-data guarantee:</em> Until approved AI model or certified relationship map is connected, returns <strong>UNKNOWN</strong> (10 pts) to prevent treating unknown as unrelated.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Component D</strong></td>
+              <td>Unplanned Rescue Intervention</td>
+              <td><strong>25 pts</strong></td>
+              <td>
+                <strong>Intervention Ladder:</strong> Return to theatre (25 pts), High-acuity rescue / ICU (20 pts), Unplanned operation (14 pts). Plus cumulative modifiers for rescue drugs (+3 pts), no pre-approval (+3 pts), or abnormal labs (+2 pts).
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Component E</strong></td>
+              <td>Longitudinal Provider Linkage</td>
+              <td><strong>15 pts</strong></td>
+              <td>
+                90-day patient lookback. Related surgery at <strong>same facility $\le 30$ days</strong> = 15 pts. Same facility 31–90 days = 9 pts. Different provider = 3 pts (routes liability to previous hospital). Clean history = 0 pts.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 5: Suppressors -->
+    <section id="suppressors">
+      <h2 class="section-heading">05. Fairness Suppressors & Safeguards</h2>
+      <p class="section-desc">
+        Mathematical ceilings that protect healthcare facilities handling high-acuity or complex referral cases.
+      </p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="font-family: var(--font-heading); color: var(--amber); margin-bottom: 0.5rem;">
+            🛡️ Recognized Progression Cap (Max 30)
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            If clinical documentation confirms that the patient's deterioration was an unavoidable biological progression (e.g., severe multi-organ failure or palliative care), the total score is hard-capped at <strong>30 points</strong> to prevent unfair hospital penalty.
+          </p>
+        </div>
+        <div class="card">
+          <h3 style="font-family: var(--font-heading); color: var(--primary); margin-bottom: 0.5rem;">
+            🏥 Different Provider Cap (Max 15)
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            If an admitted patient presents with complications arising from a surgery performed at another hospital, the receiving hospital's score is capped at <strong>15 points</strong>, routing the investigation to the originating facility.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: Risk Levels -->
+    <section id="levels">
+      <h2 class="section-heading">06. Risk Priority Bands & Action Thresholds</h2>
+      <p class="section-desc">
+        How the composite score maps directly into operational reviewer queues:
+      </p>
+
+      <div class="grid-4" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+        <div class="card" style="border-top: 4px solid var(--risk-high);">
+          <div class="risk-pill high" style="margin-bottom: 0.8rem; display: inline-block;">HIGH PRIORITY</div>
+          <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.4rem;">75 – 100</div>
+          <p style="color: var(--text-muted); font-size: 0.82rem;">
+            Definitive in-stay onset with return to theatre or severe infection. Complication lines frozen for payment denial.
+          </p>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--risk-review);">
+          <div class="risk-pill review" style="margin-bottom: 0.8rem; display: inline-block;">REVIEW QUEUE</div>
+          <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.4rem;">50 – 74</div>
+          <p style="color: var(--text-muted); font-size: 0.82rem;">
+            Significant mid-stay onset requiring medical record review of nursing and catheter insertion protocols.
+          </p>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--risk-monitor);">
+          <div class="risk-pill monitor" style="margin-bottom: 0.8rem; display: inline-block;">MONITORING</div>
+          <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.4rem;">25 – 49</div>
+          <p style="color: var(--text-muted); font-size: 0.82rem;">
+            Minor in-stay manifestations (e.g. Stage 2 decubitus). Tracked for provider quality surveillance without payment hold.
+          </p>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--risk-none);">
+          <div class="risk-pill none" style="margin-bottom: 0.8rem; display: inline-block;">FAST-TRACK CLEAN</div>
+          <div style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; margin-bottom: 0.4rem;">&lt; 25</div>
+          <p style="color: var(--text-muted); font-size: 0.82rem;">
+            Confirmed Present on Admission (POA) or baseline presentation. Auto-cleared for immediate claim payment.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 7: Live Cases -->
+    <section id="cases">
+      <h2 class="section-heading">07. Live Seed Cases (Ready on the Web Platform)</h2>
+      <p class="section-desc">
+        Click any case below to open its live investigation page on the hosted platform:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Case ID</th>
+              <th>Patient</th>
+              <th>Provider Facility</th>
+              <th>Suspected Condition</th>
+              <th>Score</th>
+              <th>Priority</th>
+              <th>Live Link</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>CLM-2026-0841</code></td>
+              <td>PAT-9401 (58F)</td>
+              <td>Muscat General Hospital</td>
+              <td><code>T81.4XXA</code> Deep surgical site MRSA infection post-laparotomy</td>
+              <td><span class="score-badge score-high">90</span></td>
+              <td><span class="risk-pill high">HIGH</span></td>
+              <td><a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-0841" target="_blank" style="color: var(--primary); font-weight: 600;">Inspect Claim ↗</a></td>
+            </tr>
+            <tr>
+              <td><code>CLM-2026-1123</code></td>
+              <td>PAT-5529 (69M)</td>
+              <td>Salalah Care Center</td>
+              <td><code>T83.511A</code> Catheter urinary tract infection (CAUTI)</td>
+              <td><span class="score-badge score-review">69</span></td>
+              <td><span class="risk-pill review">REVIEW</span></td>
+              <td><a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-1123" target="_blank" style="color: var(--primary); font-weight: 600;">Inspect Claim ↗</a></td>
+            </tr>
+            <tr>
+              <td><code>CLM-2026-2049</code></td>
+              <td>PAT-3180 (76F)</td>
+              <td>Nizwa Regional Hospital</td>
+              <td><code>L89.152</code> Sacral pressure ulcer Stage 2 (mid-stay onset)</td>
+              <td><span class="score-badge score-review">55</span></td>
+              <td><span class="risk-pill review">REVIEW</span></td>
+              <td><a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-2049" target="_blank" style="color: var(--primary); font-weight: 600;">Inspect Claim ↗</a></td>
+            </tr>
+            <tr>
+              <td><code>CLM-2026-4401</code></td>
+              <td>PAT-8812 (64F)</td>
+              <td>Sultan Qaboos Medical City</td>
+              <td><code>I26.99</code> Acute pulmonary embolism post-hip replacement</td>
+              <td><span class="score-badge score-review">53</span></td>
+              <td><span class="risk-pill review">REVIEW</span></td>
+              <td><a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-4401" target="_blank" style="color: var(--primary); font-weight: 600;">Inspect Claim ↗</a></td>
+            </tr>
+            <tr>
+              <td><code>CLM-2026-3392</code></td>
+              <td>PAT-7215 (71M)</td>
+              <td>Sohar Medical Complex</td>
+              <td><code>L89.311</code> Buttock pressure sore at ER intake (POA Verified)</td>
+              <td><span class="score-badge score-none">10</span></td>
+              <td><span class="risk-pill none">NONE</span></td>
+              <td><a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-3392" target="_blank" style="color: var(--primary); font-weight: 600;">Inspect Claim ↗</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 8: Demo Script -->
+    <section id="demo-script">
+      <h2 class="section-heading">08. The 5-Minute High-Impact Demo Script</h2>
+      <p class="section-desc">
+        A step-by-step presentation roadmap with bilingual talking points for your live demonstration:
+      </p>
+
+      <div class="timeline-script">
+        
+        <!-- Step 1 -->
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">Minute 0:00 – 1:00 · The Hook</div>
+          <h3 class="timeline-header">Introduce the Financial & Quality Problem</h3>
+          <div class="script-quote">
+            "Welcome everyone. Health insurance funds lose fortunes paying for avoidable in-hospital complications. Hospitals bill insurers for their own surgical infections and line errors. Today, I am demonstrating HAC Signal: an automated auditing platform that proves when complications occurred in-stay versus what was already Present On Admission."
+          </div>
+          <div class="script-arabic">
+            "أهلاً بكم جميعاً. في قطاع التأمين الصحي، يتم إنفاق ملايين الدولارات سنوياً على دفع فواتير مضاعفات وأخطاء طبية حدثت داخل المستشفيات (HAC). نظامنا يحدد بدقة متناهية وبالدليل القاطع: هل المرض حدث بسبب إهمال المستشفى؟ أم أن المريض دخل به أصلاً (POA) لحفظ حقوق الطرفين."
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">Minute 1:00 – 2:00 · Queue & Triage</div>
+          <h3 class="timeline-header">Showcase Live Review Queue</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            Open <a href="https://poa-hac-ui.vercel.app/claims" target="_blank" style="color: var(--primary);">poa-hac-ui.vercel.app/claims</a>. Filter by High priority, then clear filters to show diverse case mix.
+          </p>
+          <div class="script-quote">
+            "Here is our live Review Queue. The engine instantly segregates claims into actionable risk tiers: High priority surgical catastrophes, medium-tier catheter reviews, and fast-tracked clean claims that were present on admission."
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">Minute 2:00 – 3:30 · Deep Investigation</div>
+          <h3 class="timeline-header">Drill into High-Priority Case <code>CLM-2026-0841</code></h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            Open <a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-0841" target="_blank" style="color: var(--primary);">CLM-2026-0841 (Score 90)</a>.
+          </p>
+          <div class="script-quote">
+            "Notice the Evidence Story: On day 1, planned laparoscopic cholecystectomy. At hour 75, MRSA wound infection. Hours later, return to theatre for debridement. The engine gives 20/20 for timing, 25/25 for rescue surgery, and 15/15 for prior readmission. The auditor has an indisputable evidence dossier in front of them."
+          </div>
+          <div class="script-arabic">
+            "انظروا للخط الزمني السريري: المريض خضع لعملية مجدولة، وبعد 75 ساعة أصيب بتلوث الجرح، وبعدها أُعيد لغرفة العمليات لفتح البطن وتنظيف الصديد. المحرك يبرهن النتيجة عبر بطاقات أدلة سريرية لا يمكن للمستشفى إنكارها."
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">Minute 3:30 – 4:15 · Human Decision</div>
+          <h3 class="timeline-header">Clinical Note & Decisioning Action</h3>
+          <div class="script-quote">
+            "Now watch the human reviewer workflow: We click 'Review case', select 'CONFIRM_CONCERN', document our audit rationale, and freeze the complication payout. Notice that this maintains full clinical auditability."
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">Minute 4:15 – 5:00 · Population Health</div>
+          <h3 class="timeline-header">Macro Analytics & Provider Benchmarking</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            Open <a href="https://poa-hac-ui.vercel.app/analytics" target="_blank" style="color: var(--primary);">poa-hac-ui.vercel.app/analytics</a>.
+          </p>
+          <div class="script-quote">
+            "Finally, our Analytics view benchmarks healthcare providers. We can see which hospitals in our national network carry the highest infection and surgical complication rates, enabling regulators to initiate quality inspections before costs spiral."
+          </div>
+          <div class="script-arabic">
+            "في شاشة التحليلات، نستعرض تصنيف المستشفيات في السلطنة حسب معدل المضاعفات الخطيرة. هذا يمنح جهات الرقابة والتأمين قدرة استباقية لمعرفة المستشفيات التي تعاني من قصور في معايير التعقيم والجودة."
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION 9: Architecture -->
+    <section id="architecture">
+      <h2 class="section-heading">09. Technical Topology & Cloud Infrastructure</h2>
+      <p class="section-desc">
+        High-reliability split deployment model engineered for enterprise scalability:
+      </p>
+
+      <div class="diagram-card">
+        <pre class="mermaid">
+        graph TD
+            subgraph Client Layer [Frontend Tier: Vercel]
+                SPA[React 19 + TypeScript + Vite]
+                Cache[Resilient Embedded Sample Fallback]
+            end
+
+            subgraph API Layer [Backend Tier: Render Node Service]
+                Express[Express 5 API Service - Port 10000]
+                Scoring[5-Component Mathematical Rules Engine]
+                Audit[Cryptographic Audit & SHA-256 Fingerprint]
+            end
+
+            subgraph Storage Layer [Persistence Tier]
+                RuntimeJSON[Atomic Persistent JSON Store]
+                TmpFallback[/tmp/poa-hac-runtime Serverless Fallback]
+            end
+
+            SPA -->|HTTPS / CORS Requests| Express
+            Express --> Scoring
+            Scoring --> Audit
+            Audit --> RuntimeJSON
+            RuntimeJSON -.-> TmpFallback
+        </pre>
+      </div>
+
+      <div class="grid-3" style="margin-top: 1.5rem;">
+        <div class="card">
+          <h4 style="font-family: var(--font-heading); color: var(--primary); margin-bottom: 0.3rem;">Frontend (Vercel)</h4>
+          <p style="color: var(--text-dim); font-size: 0.8rem;">
+            Global edge CDN deployment with SPA routing rewrites and zero-lag client dataset caching.
+          </p>
+        </div>
+        <div class="card">
+          <h4 style="font-family: var(--font-heading); color: var(--emerald); margin-bottom: 0.3rem;">Backend (Render)</h4>
+          <p style="color: var(--text-dim); font-size: 0.8rem;">
+            Node web service in Frankfurt region, hosting the 5-component deterministic scoring algorithms.
+          </p>
+        </div>
+        <div class="card">
+          <h4 style="font-family: var(--font-heading); color: var(--purple); margin-bottom: 0.3rem;">Data Resilience</h4>
+          <p style="color: var(--text-dim); font-size: 0.8rem;">
+            Atomic temporary write with rename, protected with read-only file system detection and in-memory safety.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-dim); font-size: 0.82rem;">
+      <p>HAC Signal & Present on Admission (POA) Regulatory Compliance System · Built for Dhamani & Advanced Health Plan Auditing</p>
+      <p style="margin-top: 0.3rem;">Generated on September 29, 2026 · Confidential & Proprietary</p>
+    </footer>
+
+  </main>
+
+  <script>
+    // Initialize Mermaid diagrams
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0d131f',
+        primaryColor: '#0284c7',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: 'rgba(255,255,255,0.15)',
+        lineColor: '#38bdf8',
+        secondaryColor: '#1e293b',
+        tertiaryColor: '#101726'
+      }
+    });
+
+    // Smooth active navigation highlighting
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('section');
+      const navLinks = document.querySelectorAll('.nav-links a');
+      let currentSection = '';
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 120;
+        if (window.scrollY >= sectionTop) {
+          currentSection = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${currentSection}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
