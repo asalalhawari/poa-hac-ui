@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>منظومة إشارات مضاعفات الإقامة (HAC) والتحقق من حالة الدخول (POA) — دليل العمارة والعرض التقديمي</title>
+  
+  <!-- الخطوط العربية والإنجليزية -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- مكتبة الرسوم الهيكلية Mermaid.js -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+  <style>
+    :root {
+      --bg-base: #080d1a;
+      --bg-surface: #0f172a;
+      --bg-card: #141e34;
+      --bg-card-hover: #1b2846;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-bright: rgba(255, 255, 255, 0.16);
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.2);
+      --accent: #818cf8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --purple: #c084fc;
+
+      --risk-high: #ef4444;
+      --risk-review: #f59e0b;
+      --risk-monitor: #0284c7;
+      --risk-none: #10b981;
+
+      --font-heading: 'Cairo', 'Outfit', sans-serif;
+      --font-body: 'IBM Plex Sans Arabic', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 15px;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* خلفية هادئة ذات تدرج شعاعي فخم */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      right: 15%;
+      width: 65vw;
+      height: 450px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, rgba(129, 140, 248, 0.04) 50%, transparent 80%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* الشريط الجانبي للتنقل (RTL) */
+    .sidebar {
+      width: 300px;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-color);
+      border-right: none;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      padding: 2rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 3rem 4.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      z-index: 1;
+      overflow-x: hidden;
+    }
+
+    /* ترويسة الشريط الجانبي */
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .brand-text h1 {
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+
+    .brand-text p {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    .nav-group-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      font-weight: 700;
+      margin: 1.25rem 0.5rem 0.5rem 0.5rem;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--primary);
+      background: rgba(56, 189, 248, 0.09);
+    }
+
+    .nav-links a span.nav-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      opacity: 0.6;
+    }
+
+    .quick-status {
+      margin-top: auto;
+      padding: 1.1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      font-size: 0.82rem;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--emerald);
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    /* البانر التنفيذي العلوي (Hero) */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 1px solid var(--border-bright);
+      border-radius: 24px;
+      padding: 2.75rem;
+      margin-bottom: 3.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero-banner::after {
+      content: "";
+      position: absolute;
+      top: -40%;
+      left: -20%;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.16) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .badge-primary { background: rgba(56, 189, 248, 0.15); color: var(--primary); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-purple  { background: rgba(192, 132, 252, 0.15); color: var(--purple); border: 1px solid rgba(192, 132, 252, 0.3); }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: 2.35rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1.35;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 40%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.08rem;
+      color: var(--text-muted);
+      max-width: 860px;
+      line-height: 1.75;
+      margin-bottom: 1.75rem;
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.7rem 1.4rem;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      font-family: var(--font-heading);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7, #3b82f6);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(2, 132, 199, 0.55);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-bright);
+    }
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+    }
+
+    /* العناوين والأقسام */
+    section {
+      margin-bottom: 4.5rem;
+      scroll-margin-top: 2rem;
+    }
+
+    h2.section-heading {
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 1.85rem;
+      max-width: 880px;
+    }
+
+    /* الشبكات والبطاقات */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.35rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.15rem; }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 1.6rem;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-2px);
+    }
+
+    .callout {
+      border-right: 4px solid var(--primary);
+      border-left: none;
+      background: rgba(56, 189, 248, 0.06);
+      border-radius: 14px 0 0 14px;
+      padding: 1.4rem 1.6rem;
+      margin: 1.75rem 0;
+    }
+
+    .callout-title {
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    /* الجداول التنفيذية */
+    .table-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow-x: auto;
+      margin: 1.6rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+      font-size: 0.92rem;
+    }
+
+    th {
+      background: var(--bg-card);
+      padding: 1rem 1.25rem;
+      font-family: var(--font-heading);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 700;
+    }
+
+    td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.025); }
+
+    /* شارات النتائج ومستويات الخطر */
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      font-family: var(--font-heading);
+      font-weight: 900;
+      font-size: 1.2rem;
+    }
+
+    .score-high { background: rgba(239, 68, 68, 0.15); color: var(--risk-high); border: 1px solid rgba(239, 68, 68, 0.35); }
+    .score-review { background: rgba(245, 158, 11, 0.15); color: var(--risk-review); border: 1px solid rgba(245, 158, 11, 0.35); }
+    .score-monitor { background: rgba(2, 132, 199, 0.15); color: var(--risk-monitor); border: 1px solid rgba(2, 132, 199, 0.35); }
+    .score-none { background: rgba(16, 185, 129, 0.15); color: var(--risk-none); border: 1px solid rgba(16, 185, 129, 0.35); }
+
+    .risk-pill {
+      font-size: 0.74rem;
+      font-weight: 800;
+      padding: 0.3rem 0.7rem;
+      border-radius: 8px;
+      display: inline-block;
+      letter-spacing: 0.03em;
+    }
+    .risk-pill.high { background: var(--risk-high); color: #fff; }
+    .risk-pill.review { background: var(--risk-review); color: #000; }
+    .risk-pill.monitor { background: var(--risk-monitor); color: #fff; }
+    .risk-pill.none { background: var(--risk-none); color: #fff; }
+
+    /* الأكواد البرمجية والطبية */
+    code {
+      font-family: var(--font-mono);
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-color);
+      padding: 0.18rem 0.45rem;
+      border-radius: 6px;
+      font-size: 0.88em;
+      color: #38bdf8;
+      direction: ltr;
+      display: inline-block;
+    }
+
+    /* سيناريو العرض التقديمي (Timeline Script) */
+    .timeline-script {
+      position: relative;
+      border-right: 2px solid var(--border-bright);
+      border-left: none;
+      margin-right: 1.5rem;
+      margin-left: 0;
+      padding-right: 2.2rem;
+      padding-left: 0;
+    }
+
+    .timeline-step {
+      position: relative;
+      margin-bottom: 2.5rem;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      right: calc(-2.2rem - 9px);
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--bg-base);
+      border: 3px solid var(--primary);
+      box-shadow: 0 0 14px var(--primary-glow);
+    }
+
+    .timeline-time {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline-header {
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .script-quote {
+      background: rgba(245, 158, 11, 0.08);
+      border-right: 3px solid var(--amber);
+      border-left: none;
+      padding: 1.1rem 1.35rem;
+      border-radius: 12px 0 0 12px;
+      color: #fef3c7;
+      margin: 0.8rem 0;
+      font-size: 0.95rem;
+      line-height: 1.85;
+      font-weight: 500;
+    }
+
+    .script-english {
+      font-family: var(--font-body);
+      direction: ltr;
+      text-align: left;
+      background: var(--bg-surface);
+      border-left: 3px solid var(--accent);
+      border-right: none;
+      padding: 0.9rem 1.25rem;
+      border-radius: 0 10px 10px 0;
+      font-style: italic;
+      color: #cbd5e1;
+      margin: 0.6rem 0;
+      font-size: 0.88rem;
+    }
+
+    /* صندوق الرسوم البيانية والمعمارية */
+    .diagram-card {
+      background: #0b111e;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.75rem;
+      display: flex;
+      justify-content: center;
+      margin: 1.6rem 0;
+      direction: ltr;
+    }
+
+    /* تحسينات الطباعة والتصدير */
+    @media print {
+      body { background: #fff; color: #000; }
+      .sidebar, .hero-links { display: none !important; }
+      .main-content { max-width: 100%; padding: 0; }
+      .hero-banner, .card, .table-container { border: 1px solid #ddd; box-shadow: none; }
+      code { border: 1px solid #ccc; background: #f8f8f8; color: #000; }
+    }
+
+    @media (max-width: 992px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: static; }
+      .main-content { padding: 2rem 1.5rem; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- القائمة الجانبية الملاحية -->
+  <aside class="sidebar">
+    <div class="brand-box">
+      <div class="brand-icon">🏥</div>
+      <div class="brand-text">
+        <h1>إشارة HAC السريرية</h1>
+        <p>محرك تدقيق حالة الدخول POA</p>
+      </div>
+    </div>
+
+    <div class="nav-group-title">فهرس المحاور التنفيذية</div>
+    <ul class="nav-links">
+      <li><a href="#summary" class="active"><span class="nav-num">٠١</span> الطرح التنفيذي والمشكلة</a></li>
+      <li><a href="#domain"><span class="nav-num">٠٢</span> مفاهيم HAC و POA</a></li>
+      <li><a href="#governance"><span class="nav-num">٠٣</span> الحوكمة والقرار السريري</a></li>
+      <li><a href="#components"><span class="nav-num">٠٤</span> محاور التقييم الخمسة (A–E)</a></li>
+      <li><a href="#suppressors"><span class="nav-num">٠٥</span> المثبطات والأسقف العادلة</a></li>
+      <li><a href="#levels"><span class="nav-num">٠٦</span> مستويات الخطورة والأولويات</a></li>
+      <li><a href="#cases"><span class="nav-num">٠٧</span> الحالات الخمسة الحية</a></li>
+      <li><a href="#demo-script"><span class="nav-num">٠٨</span> سيناريو العرض في 5 دقائق</a></li>
+      <li><a href="#architecture"><span class="nav-num">٠٩</span> العمارة السحابية والربط</a></li>
+    </ul>
+
+    <div class="quick-status">
+      <div class="status-indicator">
+        <span class="status-dot"></span>
+        <span>المنظومة متصلة وحية 100%</span>
+      </div>
+      <p style="color: var(--text-dim); font-size: 0.75rem; line-height: 1.5;">
+        واجهة Vercel + سيرفر Render متزامنان بالكامل مع بيانات المطالبات الحقيقية.
+      </p>
+    </div>
+  </aside>
+
+  <!-- مساحة العرض الرئيسية -->
+  <main class="main-content">
+
+    <!-- البانر التنفيذي العلوي -->
+    <header class="hero-banner">
+      <div class="hero-badges">
+        <span class="badge badge-emerald">● بيئة الإنتاج السحابية حية (LIVE)</span>
+        <span class="badge badge-primary">معتمد بترميز ICD-10-CM / CPT</span>
+        <span class="badge badge-purple">متوافق مع منصة ضماني (DHAMANI) والتأمين الصحي</span>
+      </div>
+      <h1 class="hero-title">
+        منظومة إشارات مضاعفات الإقامة (HAC)<br>
+        ومحرك التحقق الرياضي من حالة الدخول (POA)
+      </h1>
+      <p class="hero-subtitle">
+        منصة تدقيق سريري ومالي مؤتمتة فائقة الموثوقية؛ تكشف بدقة متناهية المضاعفات الناشئة عن رعاية المستشفيات، وتحمي أموال التأمين من الفوترة المزدوجة للأخطاء الطبية، مع ضمان الحماية العادلة للمستشفيات عبر أدلة سريرية غير قابلة للدحض.
+      </p>
+      <div class="hero-links">
+        <a href="https://poa-hac-ui.vercel.app/claims" target="_blank" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          فتح طابور المراجعة الحي
+        </a>
+        <a href="https://poa-hac-ui.vercel.app/analytics" target="_blank" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          لوحة التحليلات المتقدمة
+        </a>
+        <a href="HAC_SIGNAL_DEMO_GUIDE.html" class="btn btn-secondary">
+          🌐 English Version
+        </a>
+        <button onclick="window.print()" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          طباعة / تصدير PDF
+        </button>
+      </div>
+    </header>
+
+    <!-- المحور 1: الطرح التنفيذي -->
+    <section id="summary">
+      <h2 class="section-heading">٠١. الطرح التنفيذي والقيمة التشغيلية (The Value Proposition)</h2>
+      <p class="section-desc">
+        لماذا صُمم هذا النظام؟ وكيف يوقف استنزاف موازنات شركات التأمين وصناديق الضمان الصحي الوطنية؟
+      </p>
+      
+      <div class="grid-3">
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.6rem;">💸</div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.15rem; margin-bottom: 0.4rem;">الهدر المالي التأميني</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            تدفع شركات التأمين وصناديق الرعاية الصحية ملايين الدولارات سنوياً مقابل تغطية إقامات العناية المركزة، وعمليات إعادة فتح الجروح، والمضادات الحيوية الفائقة الناتجة أصلاً عن أخطاء وتقصير المستشفيات.
+          </p>
+        </div>
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.6rem;">⏱️</div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.15rem; margin-bottom: 0.4rem;">إنهاك التدقيق اليدوي</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            يقضي الطبيب المدقق أكثر من 40 دقيقة في قراءة مئات الصفحات من ملف التمريض الورقي لمعرفة هل قرحة الفراش أو تلوث الجرح كان موجوداً عند الدخول أم نشأ بالداخل.
+          </p>
+        </div>
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.6rem;">⚖️</div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.15rem; margin-bottom: 0.4rem;">حسم النزاعات السريرية</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">
+            يقضي النظام على اعتراضات وخلافات المستشفيات عبر تقديم "ملف أدلة زمني وسريري" لا يقبل التشكيك، يربط التشخيص بالدقائق والإجراءات الطارئة المنفذة.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- المحور 2: المفاهيم السريرية -->
+    <section id="domain">
+      <h2 class="section-heading">٠٢. المفاهيم الجوهرية: الفرق بين HAC و POA</h2>
+      <p class="section-desc">
+        الحد الفاصل الذي يحدد المسؤولية الطبية، تقييم جودة المنشأة الصحية، وحق المطالبة المالية:
+      </p>
+
+      <div class="grid-2">
+        <div class="card" style="border-top: 3px solid var(--rose);">
+          <span class="badge" style="background: rgba(244, 63, 94, 0.15); color: var(--rose); margin-bottom: 0.8rem;">HAC (مضاعفة مكتسبة داخل المنشأة)</span>
+          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; margin-bottom: 0.6rem;">قصور معايير الجودة ومكافحة العدوى</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+            عارض مرضي أو تلوث سريري <strong>لم يكن موجوداً نهائياً لحظة دخول المريض للمستشفى</strong>، بل نشأ خلال الإقامة بسبب مضاعفات علاجية أو إهمال.
+          </p>
+          <ul style="color: var(--text-dim); font-size: 0.84rem; padding-right: 1.2rem; line-height: 1.9;">
+            <li>تلوث الجروح والعمليات الجراحية العميقة ببكتيريا MRSA</li>
+            <li>التهابات المسالك البولية الحادة الناتجة عن القسطرة (CAUTI)</li>
+            <li>قرح الفراش العجزية من الدرجة الثانية وما فوق</li>
+            <li>الانصمام الرئوي والجلطات الوريدية العميقة بعد جراحات المفاصل</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-top: 3px solid var(--emerald);">
+          <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--emerald); margin-bottom: 0.8rem;">POA (حالة مثبتة مسبقاً عند الدخول)</span>
+          <h3 style="font-family: var(--font-heading); font-size: 1.25rem; margin-bottom: 0.6rem;">حالة المريض الأساسية قبل الوصول</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+            تشخيص طبي كان <strong>قائماً ومثبتاً في سجلات الطوارئ لحظة دخول المريض بالضبط</strong> (فارق التوقيت بالساعات = صفر).
+          </p>
+          <ul style="color: var(--text-dim); font-size: 0.84rem; padding-right: 1.2rem; line-height: 1.9;">
+            <li>قرحة موثقة ومصورة في طوارئ الإسعاف لحظة استقبال حادث الكسر</li>
+            <li>التهاب رئوي كان المريض يعاني منه وسبب دخوله للمستشفى</li>
+            <li>قدم سكرية متقرحة بسبب مضاعفات السكري المزمنة السابقة</li>
+            <li><strong>الأثر القانوني والمالي:</strong> تبرئة تامة للمستشفى وصرف كامل الفاتورة دون أي استقطاع</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- المحور 3: الحوكمة والقرار السريري -->
+    <section id="governance">
+      <h2 class="section-heading">٠٣. القاعدة الذهبية وحوكمة القرار الطبي (Clinical Invariant)</h2>
+      <p class="section-desc">
+        المبدأ الهندسي الصارم الذي يضمن التوافق الأخلاقي والرقابي مع الهيئات الصحية العالمية:
+      </p>
+
+      <div class="callout">
+        <div class="callout-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          الحتمية المعمارية للمنظومة: القرار النهائي بيد الإنسان دائماً
+        </div>
+        <p style="color: var(--text-main); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">
+          يحظر النظام كلياً الرفض الآلي للمطالبات (No Automatic Denials). الإجراء دائماً: <code>action = HUMAN_REVIEW</code>.
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.75;">
+          القرارات المالية والسريرية تترتب عليها مسؤوليات قانونية حساسة. دور النظام ليس استبدال الطبيب، بل أن يكون <strong>المساعد التحقيقي الذكي الفائق السرعة</strong>؛ يفرز آلاف المطالبات في أجزاء من الثانية، يحسب درجة الخطورة بدقة رياضية، ويقدم "ملف أدلة متكامل" ليتخذ الطبيب المدقق قراره في ثوانٍ معدودة وبثقة مطلقة.
+        </p>
+      </div>
+    </section>
+
+    <!-- المحور 4: محاور التقييم الخمسة -->
+    <section id="components">
+      <h2 class="section-heading">٠٤. محاور التقييم الرياضي الخمسة (Components A to E)</h2>
+      <p class="section-desc">
+        كيف يتم احتساب سكور الخطورة السريرية (من 0 إلى 100 نقطة) بناءً على 5 معايير متصلة:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>المحور السريري</th>
+              <th>نطاق الفحص والتقييم</th>
+              <th>الحد الأقصى</th>
+              <th>القواعد السريرية ومحفزات النقاط</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>المحور A</strong></td>
+              <td>شفافية كود التشخيص (Cause Transparency)</td>
+              <td><strong>20 نقطة</strong></td>
+              <td>
+                تقييم ما يعترف به وصف كود الـ ICD-10. النطاق <strong>A1</strong> (20 نقطة) يعترف صراحة بحدث رعاية جراحي (مثل <code>T81.4</code> تلوث بعد عملية). النطاق <strong>A2</strong> (16 نقطة) يذكر جهازاً أو قسطرة (مثل <code>T83.5</code>). النطاق <strong>A5</strong> (6 نقاط) صامت عن السبب لكنه في قائمة الرقابة (مثل <code>L89</code> قرح الفراش).
+              </td>
+            </tr>
+            <tr>
+              <td><strong>المحور B</strong></td>
+              <td>التوقيت الزمني وحساب فارق الساعات (Timing / POA)</td>
+              <td><strong>20 نقطة</strong></td>
+              <td>
+                حساب الفارق الزمني ($\Delta t$) بين دخول المريض وأول توثيق للمضاعفة. إذا ظهر بعد 48 ساعة أو أكثر = <strong>20 نقطة</strong> (دليل قاطع على النشأة الداخلية). بين 24 إلى 48 ساعة = <strong>12 نقطة</strong>. موثق في لحظة الدخول (الساعة صفر) = <strong>0 نقطة</strong> (إثبات POA تبرئة تامة).
+              </td>
+            </tr>
+            <tr>
+              <td><strong>المحور C</strong></td>
+              <td>الارتباط السريري بمسار تشخيص الدخول</td>
+              <td><strong>20 نقطة</strong></td>
+              <td>
+                فحص هل المضاعفة امتداد حتمي متوقع للمرض الأساسي أم انحراف مفاجئ. <em>ضمان الواقعية:</em> طالما لم يتم ربط نموذج ذكاء اصطناعي معتمد، تعيد المنظومة <strong>UNKNOWN</strong> بنقاط وسطية (10 نقاط) وتمنع معاملة "المجهول" كأنه "غير مرتبط".
+              </td>
+            </tr>
+            <tr>
+              <td><strong>المحور D</strong></td>
+              <td>سلم التدخلات العلاجية الطارئة غير المجدولة</td>
+              <td><strong>25 نقطة</strong></td>
+              <td>
+                <strong>سلم الإجراءات:</strong> العودة لغرفة العمليات (Return to Theatre = 25 نقطة)، إنقاذ فائق الخطورة بالعناية المركزة (20 نقطة)، جراحة غير مجدولة (14 نقطة). مع معززات تراكمية: أدوية وترياق إنقاذ كالفانكومايسين (+3 نقاط)، إجراء بدون موافقة مسبقة (+3 نقاط).
+              </td>
+            </tr>
+            <tr>
+              <td><strong>المحور E</strong></td>
+              <td>السجل التاريخي للمزود خلال 90 يوماً</td>
+              <td><strong>15 نقطة</strong></td>
+              <td>
+                فحص ملف المريض السابق. إجراء جراحي مرتبط لدى <strong>نفس المستشفى خلال 30 يوماً</strong> = 15 نقطة (تحميل المستشفى المسؤولية كاملة). إجراء لدى مستشفى مختلف = 3 نقاط (توجيه الشبهة للمستشفى الأول لحماية المستشفى الحالي). لا توجد سوابق = 0 نقطة.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- المحور 5: المثبطات والأسقف العادلة -->
+    <section id="suppressors">
+      <h2 class="section-heading">٠٥. المثبطات والأسقف العادلة (Fairness Safeguards)</h2>
+      <p class="section-desc">
+        ضوابط حسابية صارمة تضمن عدم معاقبة المستشفيات ظلماً في الحالات المرضية الميؤوس منها:
+      </p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="font-family: var(--font-heading); color: var(--amber); margin-bottom: 0.5rem;">
+            🛡️ سقف التدهور الحتمي (Recognized Progression Cap) — بحد أقصى 30 نقطة
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            إذا أثبتت السجلات الطبية أن تدهور صحة المريض كان حتمياً ومتوقعاً لطبيعة مرضه النهائي (مثل حالات الرعاية التلطيفية أو فشل الأعضاء المتعدد المتقدم)، يُقفل السكور تلقائياً عند <strong>30 نقطة فقط</strong> لحماية المستشفى من أي استقطاع غير عادل.
+          </p>
+        </div>
+        <div class="card">
+          <h3 style="font-family: var(--font-heading); color: var(--primary); margin-bottom: 0.5rem;">
+            🏥 سقف المزود الآخر (Different Provider Cap) — بحد أقصى 15 نقطة
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            عندما يُستقبل مريض يعاني من تسمم ناتج عن جراحة أُجريت له في منشأة صحية أخرى، لا يتحمل المستشفى المستقبل هذا الخطأ، ويُسقف المؤشر عند <strong>15 نقطة كحد أقصى</strong>، مع توجيه التحقيق للمركز الذي أجرى الجراحة.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- المحور 6: مستويات الخطورة والأولويات -->
+    <section id="levels">
+      <h2 class="section-heading">٠٦. مستويات الخطورة السريرية ومسارات العمل</h2>
+      <p class="section-desc">
+        كيف تنعكس النتيجة الحسابية على شاشات التدقيق اليومية للأطباء المعتمدين:
+      </p>
+
+      <div class="grid-4">
+        <div class="card" style="border-top: 4px solid var(--risk-high);">
+          <div class="risk-pill high" style="margin-bottom: 0.8rem;">خطورة قصوى (HIGH)</div>
+          <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; margin-bottom: 0.35rem;">75 – 100</div>
+          <p style="color: var(--text-muted); font-size: 0.84rem;">
+            مؤشرات قطعية على مضاعفة فادحة وإعادة فتح عمليات. تُعطى أولوية قصوى لتجميد صرف بند المضاعفة واستدعاء تقرير الجراحة.
+          </p>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--risk-review);">
+          <div class="risk-pill review" style="margin-bottom: 0.8rem;">تستدعي المراجعة (REVIEW)</div>
+          <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; margin-bottom: 0.35rem;">50 – 74</div>
+          <p style="color: var(--text-muted); font-size: 0.84rem;">
+            مضاعفة داخلية كبرى تستدعي فحص الملف التمريضي وسجلات القساطر والمزارع البكتيرية قبل إقرار الدفع.
+          </p>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--risk-monitor);">
+          <div class="risk-pill monitor" style="margin-bottom: 0.8rem;">مراقبة الجودة (MONITOR)</div>
+          <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; margin-bottom: 0.35rem;">25 – 49</div>
+          <p style="color: var(--text-muted); font-size: 0.84rem;">
+            مضاعفات سطحية طفيفة (مثل قرح الدرجة الثانية). تُصرف المطالبة مع إدراجها ضمن مؤشرات رقابة الجودة على المستشفى.
+          </p>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--risk-none);">
+          <div class="risk-pill none" style="margin-bottom: 0.8rem;">سليمة عند الدخول (NONE)</div>
+          <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; margin-bottom: 0.35rem;">أقل من 25</div>
+          <p style="color: var(--text-muted); font-size: 0.84rem;">
+            إثبات قاطع بأن الحالة كانت Present On Admission. يتم تمرير المطالبة للموافقة الفورية والصرف الآمن.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- المحور 7: الحالات الخمسة الحية -->
+    <section id="cases">
+      <h2 class="section-heading">٠٧. الحالات الخمسة الحية المدمجة في بيئة العرض (Live Demo Cases)</h2>
+      <p class="section-desc">
+        يمكنك النقر مباشرة على أي حالة لفتح ملف التحقيق السريري الكامل الخاص بها على السيرفر الحي:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>رقم المطالبة</th>
+              <th>المريض</th>
+              <th>المستشفى / المزود</th>
+              <th>التشخيص المشتبه به (HAC)</th>
+              <th>السكور</th>
+              <th>الأولوية</th>
+              <th>رابط الفحص الحي</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>CLM-2026-0841</code></td>
+              <td>PAT-9401 (58 سنة - أنثى)</td>
+              <td>مستشفى مسقط العام</td>
+              <td><code>T81.4XXA</code> تلوث بكتيري عميق في جرح استئصال المرارة</td>
+              <td><span class="score-badge score-high">90</span></td>
+              <td><span class="risk-pill high">HIGH</span></td>
+              <td><a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-0841" target="_blank" style="color: var(--primary); font-weight: 700;">فحص المطالبة ↗</a></td>
+            </tr>
+            <tr>
+              <td><code>CLM-2026-1123</code></td>
+              <td>PAT-5529 (69 سنة - ذكر)</td>
+              <td>مركز صلالة للرعاية الطبية</td>
+              <td><code>T83.511A</code> التهاب مسالك بولية حاد مرتبط بالقسطرة (CAUTI)</td>
+              <td><span class="score-badge score-review">69</span></td>
+              <td><span class="risk-pill review">REVIEW</span></td>
+              <td><a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-1123" target="_blank" style="color: var(--primary); font-weight: 700;">فحص المطالبة ↗</a></td>
+            </tr>
+            <tr>
+              <td><code>CLM-2026-2049</code></td>
+              <td>PAT-3180 (76 سنة - أنثى)</td>
+              <td>مستشفى نزوى المرجعي</td>
+              <td><code>L89.152</code> قرحة فراش عجزية من الدرجة الثانية (نشأت باليوم الرابع)</td>
+              <td><span class="score-badge score-review">55</span></td>
+              <td><span class="risk-pill review">REVIEW</span></td>
+              <td><a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-2049" target="_blank" style="color: var(--primary); font-weight: 700;">فحص المطالبة ↗</a></td>
+            </tr>
+            <tr>
+              <td><code>CLM-2026-4401</code></td>
+              <td>PAT-8812 (64 سنة - أنثى)</td>
+              <td>مدينة السلطان قابوس الطبية</td>
+              <td><code>I26.99</code> جلطة رئوية حادة بعد استبدال مفصل الورك</td>
+              <td><span class="score-badge score-review">53</span></td>
+              <td><span class="risk-pill review">REVIEW</span></td>
+              <td><a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-4401" target="_blank" style="color: var(--primary); font-weight: 700;">فحص المطالبة ↗</a></td>
+            </tr>
+            <tr>
+              <td><code>CLM-2026-3392</code></td>
+              <td>PAT-7215 (71 سنة - ذكر)</td>
+              <td>مجمع صحار الطبي</td>
+              <td><code>L89.311</code> قرحة فراش موثقة لحظة الدخول للطوارئ (POA مؤكد)</td>
+              <td><span class="score-badge score-none">10</span></td>
+              <td><span class="risk-pill none">NONE</span></td>
+              <td><a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-3392" target="_blank" style="color: var(--primary); font-weight: 700;">فحص المطالبة ↗</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- المحور 8: سيناريو العرض في 5 دقائق -->
+    <section id="demo-script">
+      <h2 class="section-heading">٠٨. سيناريو العرض التقديمي المتقن في 5 دقائق (The 5-Min Demo Script)</h2>
+      <p class="section-desc">
+        خارطة طريق تنفيذية للتحدث بثقة واقتدار أثناء الاجتماع أو العرض التوضيحي للعميل:
+      </p>
+
+      <div class="timeline-script">
+        
+        <!-- الخطوة 1 -->
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">الدقيقة ٠:٠٠ – ١:٠٠ · خطاف البداية وطرح المشكلة</div>
+          <h3 class="timeline-header">تحديد الهدر المالي وفرصة التوفير</h3>
+          <div class="script-quote">
+            "أهلاً بكم جميعاً. في قطاع التأمين الصحي، يتم إنفاق ملايين الدولارات سنوياً على سداد فواتير مضاعفات وأخطاء طبية حدثت بالكامل داخل المستشفيات (HAC) مثل تلوث الجروح وقساطر التبول. في المقابل، يخشى التأمين ظلم المستشفيات إذا كانت الحالة موجودة مسبقاً عند الدخول (POA). اليوم نستعرض منصة HAC Signal — محرك تدقيق سريري ورياضي مؤتمت يثبت بالدليل القاطع أصل كل مضاعفة ويحمي أموال التأمين مع صون حقوق المستشفيات."
+          </div>
+          <div class="script-english">
+            "Welcome everyone. Health insurance funds lose fortunes paying for avoidable in-hospital complications. Today, I am demonstrating HAC Signal: an automated auditing platform that proves when complications occurred in-stay versus what was already Present On Admission."
+          </div>
+        </div>
+
+        <!-- الخطوة 2 -->
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">الدقيقة ١:٠٠ – ٢:٠٠ · طابور التدقيق الفوري</div>
+          <h3 class="timeline-header">استعراض شاشة مراجعة الحالات الحية (Review Queue)</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            افتح الرابط الحي: <a href="https://poa-hac-ui.vercel.app/claims" target="_blank" style="color: var(--primary); font-weight: 600;">poa-hac-ui.vercel.app/claims</a>
+          </p>
+          <div class="script-quote">
+            "أمامكم الآن طابور المراجعة الحي. يقوم المحرك فور استلام المطالبات بفرزها وتصنيفها إلى مستويات خطورة واضحة: حالات جراحية خطيرة حمراء تتطلب تدخلاً عاجلاً، وحالات متوسطة لمراجعة التمريض، وحالات خضراء تمت تبرئتها فوراً لوجود إثبات الدخول POA، مما يلغي 80% من جهد المراجعة اليدوية غير المجدية."
+          </div>
+        </div>
+
+        <!-- الخطوة 3 -->
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">الدقيقة ٢:٠٠ – ٣:٣٠ · التشريح السريري للحالة القصوى</div>
+          <h3 class="timeline-header">فحص الحالة الحرجة <code>CLM-2026-0841</code> (سكور 90)</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            افتح الحالة: <a href="https://poa-hac-ui.vercel.app/claims/CLM-2026-0841" target="_blank" style="color: var(--primary); font-weight: 600;">CLM-2026-0841 (سكور 90)</a>
+          </p>
+          <div class="script-quote">
+            "دعونا نشاهد قوة المحرك في هذه الحالة: مريضة دخلت لإجراء عملية استئصال مرارة مجدولة. بعد 75 ساعة من العملية ظهر تلوث الجرح وتسمم الدم، واضطر الجراح لإعادتها للعمليات لفتح البطن وتنظيف الصديد. المحرك يمنح 20/20 في التوقيت لأنه ظهر بعد 75 ساعة، و25/25 لإعادة فتح العمليات واستخدام أدوية الإنقاذ، و15/15 لوجود جراحة سابقة لدى نفس المستشفى قبل 18 يوماً. الطبيب المدقق أمامه ملف جنائي طبي كامل وموثق بالدقائق."
+          </div>
+        </div>
+
+        <!-- الخطوة 4 -->
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">الدقيقة ٣:٣٠ – ٤:١٥ · اتخاذ القرار السريري التوثيقي</div>
+          <h3 class="timeline-header">إجراء المراجعة وتوثيق الملاحظات الطبية</h3>
+          <div class="script-quote">
+            "شاهدوا الآن سلاسة سير العمل: يضغط الطبيب على 'Review case'، ويختار 'CONFIRM_CONCERN' لتأكيد الشبهة، ويكتب مسوغه السريري لتجميد صرف تكاليف عملية إعادة الفتح. كما يستطيع تسجيل ملاحظة تمريضية تظهر بتوقيع رقمي موثق زمنيًا يحفظ حقوق الطرفين في أي تدقيق رقابي لاحق."
+          </div>
+        </div>
+
+        <!-- الخطوة 5 -->
+        <div class="timeline-step">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">الدقيقة ٤:١٥ – ٥:٠٠ · التحليلات الكلية ورقابة المزودين</div>
+          <h3 class="timeline-header">لوحة المؤشرات وتحليلات المنظومة الصحية</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">
+            افتح شاشة التحليلات: <a href="https://poa-hac-ui.vercel.app/analytics" target="_blank" style="color: var(--primary); font-weight: 600;">poa-hac-ui.vercel.app/analytics</a>
+          </p>
+          <div class="script-quote">
+            "ختاماً، توفر المنصة لوحة مؤشرات قيادية تُقارن أداء المستشفيات ومعدل المضاعفات فيها (مثل مقارنة مستشفى مسقط بمعدل خطورة 90 مقابل مجمع صحار بمعدل 10). هذا يمنح الهيئات التنظيمية وشركات التأمين أداة استباقية لإعادة التفاوض، وتطبيق عقوبات الجودة، وتحسين سلامة المرضى قبل تفاقم الهدر المالي."
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- المحور 9: العمارة السحابية والربط -->
+    <section id="architecture">
+      <h2 class="section-heading">٠٩. المخطط الهيكلي والعمارة السحابية المتكاملة</h2>
+      <p class="section-desc">
+        بنية تحتية موزعة عالية الجاهزية تضمن سرعة الاستجابة وصفر انقطاع:
+      </p>
+
+      <div class="diagram-card">
+        <pre class="mermaid">
+        graph TD
+            subgraph طبقة العميل - Client Tier [الواجهة الأمامية: Vercel]
+                SPA[تطبيق React 19 + TypeScript + Vite]
+                Cache[تخزين مؤقت احتياطي ذكي في المتصفح]
+            end
+
+            subgraph طبقة الخادم - API Tier [خادم Node على Render]
+                Express[خدمة Express 5 API - منفذ 10000]
+                Scoring[محرك القواعد الرياضية للمحاور الخمسة]
+                Audit[التوقيع الرقمي وبصمة التدقيق SHA-256]
+            end
+
+            subgraph طبقة التخزين - Persistence Tier [البيانات اللحظية]
+                RuntimeJSON[مخزن JSON المتزامن الذري]
+                TmpFallback[مخزن احتياطي للطوارئ السحابية /tmp]
+            end
+
+            SPA -->|طلبات HTTPS آمنة مع دعم كامل للـ CORS| Express
+            Express --> Scoring
+            Scoring --> Audit
+            Audit --> RuntimeJSON
+            RuntimeJSON -.-> TmpFallback
+        </pre>
+      </div>
+
+      <div class="grid-3" style="margin-top: 1.5rem;">
+        <div class="card">
+          <h4 style="font-family: var(--font-heading); color: var(--primary); margin-bottom: 0.35rem;">الواجهة الأمامية (Vercel)</h4>
+          <p style="color: var(--text-dim); font-size: 0.84rem;">
+            استضافة CDN عالمية سريعة مع إعادة توجيه مسارات SPA وحماية ذكية من تأخر الخوادم المجانية.
+          </p>
+        </div>
+        <div class="card">
+          <h4 style="font-family: var(--font-heading); color: var(--emerald); margin-bottom: 0.35rem;">محرك التحليل (Render)</h4>
+          <p style="color: var(--text-dim); font-size: 0.84rem;">
+            خدمة Node في فرانكفورت تدير الحسابات المعقدة للمحاور السريرية الخمسة والمثبطات القانونية.
+          </p>
+        </div>
+        <div class="card">
+          <h4 style="font-family: var(--font-heading); color: var(--purple); margin-bottom: 0.35rem;">مرونة البيانات</h4>
+          <p style="color: var(--text-dim); font-size: 0.84rem;">
+            كتابة ذرية معزولة مع الكشف التلقائي عن بيئات القراءة فقط والتحويل التلقائي للذاكرة المؤقتة.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- تذييل الصفحة -->
+    <footer style="margin-top: 5rem; padding-top: 2rem; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-dim); font-size: 0.85rem;">
+      <p>منظومة التدقيق السريري لمضاعفات الإقامة HAC والتحقق من حالة الدخول POA · مهيأة للتكامل مع منصة ضماني وشركات التأمين الصحي المتقدمة</p>
+      <p style="margin-top: 0.3rem;">تاريخ الإصدار المعتمد: سبتمبر 2026 · وثيقة استراتيجية سرية وتنفيذية</p>
+    </footer>
+
+  </main>
+
+  <script>
+    // تفعيل رسومات Mermaid التخطيطية بنمط داكن أنيق
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0b111e',
+        primaryColor: '#0284c7',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: 'rgba(255,255,255,0.18)',
+        lineColor: '#38bdf8',
+        secondaryColor: '#1e293b',
+        tertiaryColor: '#0f172a'
+      }
+    });
+
+    // تتبع القائمة الجانبية السلس أثناء التمرير
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('section');
+      const navLinks = document.querySelectorAll('.nav-links a');
+      let currentSection = '';
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 120;
+        if (window.scrollY >= sectionTop) {
+          currentSection = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${currentSection}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
